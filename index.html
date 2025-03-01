@@ -1,0 +1,356 @@
+﻿<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة عبق</title>
+    <style>
+        /* التصميم العام */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* تصميم صفحة الدخول */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #e91e63;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            animation: wave 3s infinite ease-in-out;
+        }
+
+        @keyframes wave {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .button {
+            background-color: #e91e63;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #c2185b;
+            transform: scale(1.1);
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .popup input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+        }
+
+        .popup button {
+            background-color: #e91e63;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #c2185b;
+        }
+
+        .welcome-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1000;
+            font-size: 1.5rem;
+            color: #e91e63;
+        }
+
+        /* تصميم صفحة اللعبة */
+        .game-page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: #888;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .glass-box {
+            width: 90%;
+            height: 90%;
+            background: rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 5px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .card.flipped {
+            background: #e91e63;
+            color: white;
+        }
+
+        .card.flipped.not-bayan {
+            background: #ffeb3b;
+            color: black;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        /* رسائل الفوز والخسارة */
+        .message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            z-index: 1000;
+            font-size: 1.5rem;
+            color: #e91e63;
+        }
+
+        .message.win {
+            background: rgba(0, 255, 0, 0.9);
+            color: white;
+        }
+
+        .message.lose {
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        /* النص في الأسفل */
+        footer {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- صفحة الدخول -->
+    <div class="glass-effect" id="loginPage">
+        <h1>عبق علي</h1>
+        <button class="button" onclick="showPopup()">مرحبا عبق</button>
+    </div>
+
+    <!-- نافذة إدخال الباسوورد -->
+    <div class="popup" id="popup">
+        <p>أدخل السر المكون من 5 أرقام:</p>
+        <input type="text" id="password" maxlength="5" placeholder="أدخل الرقم هنا">
+        <button onclick="checkPassword()">دخول</button>
+    </div>
+
+    <!-- رسالة الترحيب -->
+    <div class="welcome-message" id="welcomeMessage">
+        <p>مرحبا عبق الجميلة!</p>
+    </div>
+
+    <!-- صفحة اللعبة -->
+    <div class="game-page" id="gamePage">
+        <div class="glass-box">
+            <div class="grid" id="grid"></div>
+        </div>
+    </div>
+
+    <!-- رسائل الفوز والخسارة -->
+    <div class="message win" id="winMessage">
+        <p>🎉 مبروك! لقد فزت! 🎉</p>
+        <p class="timer" id="winTimer"></p>
+    </div>
+
+    <div class="message lose" id="loseMessage">
+        <p>😢 خسرت! حاول مرة أخرى! 😢</p>
+        <p class="timer" id="loseTimer"></p>
+    </div>
+
+    <!-- النص في الأسفل -->
+    <footer>E.hussein.A 2025</footer>
+
+    <script>
+        // عرض نافذة إدخال الباسوورد
+        function showPopup() {
+            document.getElementById('popup').style.display = 'block';
+        }
+
+        // التحقق من الباسوورد
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            if (password === "12321") {
+                document.getElementById('popup').style.display = 'none';
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('welcomeMessage').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('welcomeMessage').style.display = 'none';
+                    document.getElementById('gamePage').style.display = 'flex';
+                    initializeGame();
+                }, 2000); // الانتقال إلى اللعبة بعد ثانيتين
+            } else {
+                alert("لست عبق! أعد المحاولة.");
+            }
+        }
+
+        // تهيئة اللعبة
+        let bayanStreak = 0;
+        let mistakes = 0;
+
+        function initializeGame() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = ''; // إعادة تعيين الجدول
+            bayanStreak = 0;
+            mistakes = 0;
+
+            const totalCards = 100;
+            const bayanCount = 50;
+            const notBayanCount = 50;
+
+            const cardValues = Array(bayanCount).fill("عبق").concat(Array(notBayanCount).fill("ليست عبق"));
+            cardValues.sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < totalCards; i++) {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.value = cardValues[i];
+                card.addEventListener('click', () => flipCard(card));
+                grid.appendChild(card);
+            }
+        }
+
+        // قلب البطاقة
+        function flipCard(card) {
+            if (card.classList.contains('flipped')) return;
+
+            card.classList.add('flipped');
+            card.textContent = card.dataset.value;
+
+            if (card.dataset.value === "عبق") {
+                bayanStreak++;
+                if (bayanStreak === 3) {
+                    showMessage('win');
+                }
+            } else {
+                mistakes++;
+                bayanStreak = 0;
+                if (mistakes === 3) {
+                    showMessage('lose');
+                }
+            }
+        }
+
+        // عرض رسالة الفوز أو الخسارة
+        function showMessage(type) {
+            const message = type === 'win' ? document.getElementById('winMessage') : document.getElementById('loseMessage');
+            const timer = type === 'win' ? document.getElementById('winTimer') : document.getElementById('loseTimer');
+            message.style.display = 'block';
+
+            let count = 5;
+            timer.textContent = `العودة إلى الصفحة الرئيسية بعد: ${count} ثواني`;
+
+            const interval = setInterval(() => {
+                count--;
+                timer.textContent = `العودة إلى الصفحة الرئيسية بعد: ${count} ثواني`;
+                if (count === 0) {
+                    clearInterval(interval);
+                    resetGame();
+                }
+            }, 1000);
+        }
+
+        // إعادة تعيين اللعبة
+        function resetGame() {
+            document.getElementById('winMessage').style.display = 'none';
+            document.getElementById('loseMessage').style.display = 'none';
+            document.getElementById('gamePage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
